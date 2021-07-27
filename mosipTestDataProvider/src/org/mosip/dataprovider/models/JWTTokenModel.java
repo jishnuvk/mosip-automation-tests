@@ -1,18 +1,19 @@
 package org.mosip.dataprovider.models;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.json.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Data;
+
+import java.util.Map;
+
+import org.json.JSONObject;
 @Data
 public class JWTTokenModel {
 
 	//Map<String, Object> jsonHeader; // = new HashMap<String, Object>();
 	JSONObject jwtPayload;
-	String jwtSign;
+	JSONObject jwtSign;
 	JSONObject jwtHeader;
-	public static final String BIOMETRIC_SEPERATOR = "(?<=\\.)(.*)(?=\\.)";
 	
 	public JWTTokenModel(String jwtToken) {
 		 java.util.Base64.Decoder decoder = java.util.Base64.getUrlDecoder();
@@ -21,17 +22,10 @@ public class JWTTokenModel {
          String headerJson = new String(decoder.decode(parts[0]));
          String payloadJson = new String(decoder.decode(parts[1]));
          jwtPayload = new JSONObject(payloadJson);
-         String signatureJson = new String(decoder.decode(parts[2]));
+         //String signatureJson = new String(decoder.decode(parts[2]));
          jwtHeader = new JSONObject(headerJson);
-         //jwtSign = signatureJson;
-        
-        Pattern pattern = Pattern.compile(BIOMETRIC_SEPERATOR);
-		Matcher matcher = pattern.matcher(jwtToken);
-		if(matcher.find()) {
-			//returns header..signature
-			jwtSign= jwtToken.replace(matcher.group(1),"");
-		}
-        //JWTTokenHeader(headerJson);
+      //   jwtSign = new JSONObject(signatureJson);
+        // JWTTokenHeader(headerJson);
 	}
 	
 

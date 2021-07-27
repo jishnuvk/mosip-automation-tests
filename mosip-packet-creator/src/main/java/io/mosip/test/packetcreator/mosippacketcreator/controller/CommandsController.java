@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.jose4j.json.internal.json_simple.JSONObject;
+// import org.jose4j.json.internal.json_simple.JSONObject;
+import org.json.JSONObject;
 import org.mosip.dataprovider.util.CommonUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+
 
 import io.mosip.test.packetcreator.mosippacketcreator.service.CommandsService;
 import io.swagger.annotations.Api;
@@ -28,7 +28,6 @@ import variables.VariableManager;
 @RestController
 public class CommandsController {
 
-	
 	@Autowired
     CommandsService commandsService;
 	
@@ -80,7 +79,7 @@ public class CommandsController {
 			JSONObject json = new JSONObject();
 			json.put(key, stsVal);
 			json.put("ts", ts);
-			return json.toJSONString();
+			return json.toString();
 			
 		}catch(Exception e) {
 			

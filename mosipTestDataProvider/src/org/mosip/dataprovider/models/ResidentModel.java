@@ -69,19 +69,16 @@ public class ResidentModel  implements Serializable {
 	private List<BioModality> bioExceptions;
 	
 	private String path;
-	private Hashtable<String,Integer> docIndexes;
 	//resident Metadata
 	//private double schemaVersion;
 	//private String targetCotext;
 	
 	public ResidentModel() {
 	
-		//id = String.format("%04d", CommonUtil.generateRandomNumbers(1,99999, 1000)[0]);
+		id = String.format("%04d", CommonUtil.generateRandomNumbers(1,99999, 1000)[0]);
 	//ID must be atleast 12 characters
-		//id = id + id + id;
-		int [] r = CommonUtil.generateRandomNumbers(2, 99999, 11111);
-		id = String.format("%d%d", r[0],r[1]);
-		docIndexes = new Hashtable<String,Integer>();
+		id = id + id + id;
+		
 	}
 
 	public String toJSONString() {

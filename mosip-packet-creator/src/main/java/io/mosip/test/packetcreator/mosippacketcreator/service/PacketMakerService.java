@@ -144,9 +144,6 @@ public class PacketMakerService {
             		if(k.toString().equals("mosip.test.regclient.supervisorid")) {
             			supervisorId = v.toString();
                 	}
-            		else if (k.toString().equals("mosip.test.regclient.userid")) {
-                        officerId = v.toString();
-                    }
     			
     		});
     	}
@@ -233,9 +230,6 @@ public class PacketMakerService {
             		if(k.toString().equals("mosip.test.regclient.supervisorid")) {
             			supervisorId = v.toString();
                 	}
-            		else if (k.toString().equals("mosip.test.regclient.userid")) {
-                        officerId = v.toString();
-                    }
     			
     		});
     	}
@@ -465,8 +459,6 @@ public class PacketMakerService {
         	writeJSONFile(mergedJsonMap, "c:\\temp\\id_"+regId + ".json");
         }*/
         updatePacketMetaInfo(packetRootFolder, "metaData","registrationId", regId, true);
-        if(preregId!=null && !preregId.equalsIgnoreCase("0")) // newly added
-
         updatePacketMetaInfo(packetRootFolder, "metaData","preRegistrationId", preregId, true);
         
         updatePacketMetaInfo(packetRootFolder, "metaData","creationDate", APIRequestUtil.getUTCDateTime(null), true);

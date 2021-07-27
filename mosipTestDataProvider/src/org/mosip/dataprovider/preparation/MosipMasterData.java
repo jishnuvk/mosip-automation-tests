@@ -1,14 +1,13 @@
 package org.mosip.dataprovider.preparation;
 
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
 
@@ -34,7 +33,6 @@ import org.mosip.dataprovider.models.MosipPreRegLoginConfig;
 import org.mosip.dataprovider.models.ResidentModel;
 import org.mosip.dataprovider.models.SchemaRule;
 import org.mosip.dataprovider.models.setup.MosipDeviceModel;
-import org.mosip.dataprovider.models.setup.MosipMachineModel;
 import org.mosip.dataprovider.test.CreatePersona;
 import org.mosip.dataprovider.util.CommonUtil;
 import org.mosip.dataprovider.util.Gender;
@@ -220,14 +218,9 @@ public  class MosipMasterData {
 						objectMapper.getTypeFactory().constructCollectionType(List.class, LocationHierarchyModel.class));
 				if(locHierarchy != null) {
 					locationHierarchy = new LocationHierarchyModel[ locHierarchy.size()];
-					int index = 0;
 					for (LocationHierarchyModel object : locHierarchy) {
-						if(object.getIsActive()) {
-							locationHierarchy[index] = object;
-							index++;
-							//if(object.getHierarchyLevel() < locHierarchy.size()-1 )
-							//	locationHierarchy[object.getHierarchyLevel()] = object;
-						}
+						if(object.getIsActive())
+						locationHierarchy[object.getHierarchyLevel()] = object;
 					}
 				}
 	
@@ -292,44 +285,10 @@ public  class MosipMasterData {
 			//JSONObject configObject = resp.getJSONObject("response");
 			
 			if(resp != null) {
-				try {
-					config.setMosip_country_code(  resp.getString("mosip.country.code"));
-				}catch(Exception e) {
-					
-				}
-				try {
-					config.setMandatory_languages(resp.getString("mosip.mandatory-languages"));
-				}catch(Exception e) {
-					
-				}
-				try {
-					config.setMin_languages_count(resp.getString("mosip.min-languages.count"));
-				}catch(Exception e) {
-					
-				}
-				try {
-					config.setOptional_languages(resp.getString("mosip.optional-languages"));
-				}catch(Exception e) {
-					
-				}
-				try {
-					config.setMosip_id_validation_identity_dateOfBirth(resp.getString("mosip.id.validation.identity.dateOfBirth"));
-				}catch(Exception e) {
-					
-				}
-				
-				try {
-					config.setMosip_primary_language(resp.getString("mosip.primary-language"));
-				}catch(Exception e) {
-					
-				}
-				
-				try {
+				config.setMosip_country_code(  resp.getString("mosip.country.code"));
+				config.setMosip_id_validation_identity_dateOfBirth(resp.getString("mosip.id.validation.identity.dateOfBirth"));
+				config.setMosip_primary_language(resp.getString("mosip.primary-language"));
 				config.setPreregistration_documentupload_allowed_file_type(resp.getString("preregistration.documentupload.allowed.file.type"));
-				}catch(Exception e) {
-					
-				}
-				
 				setCache(url, config);
 			}
 		} catch (Exception e) {
@@ -414,7 +373,6 @@ public  class MosipMasterData {
         
         return queryParams;
 	}
-	 /*
 	 public static Hashtable<Double,List<MosipIDSchema>>  getIDSchemaLatestVersion_defunct() {
 			
 		Hashtable<Double,List<MosipIDSchema>> tbl = new Hashtable<Double,List<MosipIDSchema>> ();
@@ -479,7 +437,22 @@ public  class MosipMasterData {
 					
 					setCache(url, tbl);
 				}
-				
+				/*
+				if(idSchema != null) {
+						
+					ObjectMapper objectMapper = new ObjectMapper();
+					objectMapper.setSerializationInclusion(Include.NON_NULL);
+
+					
+					for(int i=0; i < idSchema.length(); i++) {
+						MosipIDSchema schema = objectMapper.readValue(idSchema.get(i).toString(), MosipIDSchema.class);
+						listSchema.add(schema);
+					}
+
+					tbl.put(schemaVersion, listSchema);
+					
+					setCache(url, tbl);
+				}*/
 						
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -487,7 +460,7 @@ public  class MosipMasterData {
 			}
 	        return tbl;
 		}
-*/
+
 	 private static JSONArray getRequiredFileds(JSONObject resp) {
 
 			String schemaJson = resp.getString("schemaJson");
@@ -502,22 +475,6 @@ public  class MosipMasterData {
 			return jsonArray;
 				
 	 }
-	 private static JSONObject getIdentityPropsFromIDSchema(JSONObject resp) {
-
-			String schemaJson = resp.getString("schemaJson");
-
-			JSONObject identityProps = null;
-		
-			if(schemaJson != null && !schemaJson.equals("")) {
-				JSONObject schemaObj = new JSONObject(schemaJson);
-				JSONObject identityObj = schemaObj.getJSONObject("properties").getJSONObject("identity");
-				identityProps = identityObj.getJSONObject("properties");
-				
-			}
-			return identityProps;
-				
-	 }
-
 	public static String getIDSchemaSchemaLatestVersion() {
 		String schemaJson = null;
 		
@@ -539,16 +496,10 @@ public  class MosipMasterData {
 		}
 	    return schemaJson;
 	}
-	public static void test1() {
-		
-		System.out.println("Hello");
-		
-	}
-	public static Hashtable<Double,Properties>  getIDSchemaLatestVersion() {
 	
-		Hashtable<Double,Properties> tbl = new Hashtable<Double,Properties> ();
-		
-		//Hashtable<Double,List<MosipIDSchema>> tbl = new Hashtable<Double,List<MosipIDSchema>> ();
+	public static Hashtable<Double,List<MosipIDSchema>>  getIDSchemaLatestVersion() {
+	
+		Hashtable<Double,List<MosipIDSchema>> tbl = new Hashtable<Double,List<MosipIDSchema>> ();
 		String url = VariableManager.getVariableValue("urlBase").toString() +
 				VariableManager.getVariableValue(
 				VariableManager.NS_MASTERDATA,
@@ -558,7 +509,7 @@ public  class MosipMasterData {
 	
 		Object o =getCache(url);
 		if(o != null)
-			return( (Hashtable<Double,Properties>) o);
+			return( (Hashtable<Double,List<MosipIDSchema>>) o);
 
         try {
 			JSONObject resp = RestClient.get(url, genQueryParams(), new JSONObject());
@@ -570,23 +521,19 @@ public  class MosipMasterData {
 			String schemaTitle = "";
 			idSchema = resp.getJSONArray("schema"); //UISpec
 			System.out.println(idSchema.toString());
-			CommonUtil.saveToTemp(idSchema.toString(), "uispec.json");
-			CommonUtil.saveToTemp(resp.getString("schemaJson"), "schemaJson.json");
+			CommonUtil.saveToTemp(idSchema.toString(), "idschema.json");
 			
 			schemaVersion=	resp.getDouble( "idVersion");
 			schemaTitle = resp.getString("title");
 			
 			if(idSchema != null) {
 				JSONArray reqdFields = getRequiredFileds(resp); //FROM IDSchema
-				//JSONObject idschemaProps = getIdentityPropsFromIDSchema(resp);
-				
 				ObjectMapper objectMapper = new ObjectMapper();
 				objectMapper.setSerializationInclusion(Include.NON_NULL);
 
 				List<MosipIDSchema>  listSchema  = new ArrayList<MosipIDSchema>();
 				for(int i=0; i < idSchema.length(); i++) {
-					 MosipIDSchema schema = objectMapper.readValue(idSchema.get(i).toString(),
-							 MosipIDSchema.class);
+					 MosipIDSchema schema = objectMapper.readValue(idSchema.get(i).toString(), MosipIDSchema.class);
 					 listSchema.add(schema);
 					 /*
 					if(schema.getId().toLowerCase().contains("uin") || schema.getId().toLowerCase().contains("rid") )
@@ -602,23 +549,8 @@ public  class MosipMasterData {
 						}
 					}*/
 				}
-				List<String> requiredAttributes = new ArrayList<String>();
-				
-				JSONObject idschemaProps = getIdentityPropsFromIDSchema(resp);
-				Iterator<String> propNames = idschemaProps.keys();
-				while(propNames.hasNext()) {
-					String key = propNames.next();
-					requiredAttributes.add(key);
-				}
-					
-				/*
-				for(int i=0; i < reqdFields.length(); i++)
-					requiredAttributes.add(reqdFields.getString(i).trim());
-				*/
-				Properties prop = new Properties();
-				prop.put("schemaList", listSchema);
-				prop.put("requiredAttributes",requiredAttributes);
-				tbl.put(schemaVersion, prop);
+
+				tbl.put(schemaVersion, listSchema);
 				
 				setCache(url, tbl);
 			}
@@ -794,12 +726,11 @@ public  class MosipMasterData {
 			langCode = primLang;
 	
 		LocationHierarchyModel[]  locHiModels = MosipMasterData.getLocationHierarchy(langCode);
-		
-		//int maxLevel  = 0;
+		int maxLevel  = 0;
 		
 		if(locHiModels != null) {
-			//maxLevel = Arrays.stream(locHiModels).max(Comparator.comparing(
-			//		LocationHierarchyModel::getHierarchyLevel) ).get().getHierarchyLevel();
+			maxLevel = Arrays.stream(locHiModels).max(Comparator.comparing(
+					LocationHierarchyModel::getHierarchyLevel) ).get().getHierarchyLevel();
 			
 			/*
 			for(LocationHierarchyModel l: locHiModels) {
@@ -812,8 +743,8 @@ public  class MosipMasterData {
 		}
 		ApplicationConfigIdSchema idschema =  new ApplicationConfigIdSchema(); //getAppConfigIdSchema();
 		//"contactType": "Postal"
-		Hashtable<Double,Properties> tblSchema = getIDSchemaLatestVersion();
-		List<MosipIDSchema> idSchemaList = (List<MosipIDSchema>) tblSchema.get( tblSchema.keys().nextElement()).get("schemaList");
+		Hashtable<Double, List<MosipIDSchema>> tblSchema = getIDSchemaLatestVersion();
+		List<MosipIDSchema> idSchemaList = tblSchema.get( tblSchema.keys().nextElement());
 		List<MosipIDSchema> locSchemaList = new ArrayList<MosipIDSchema>();
 		for(MosipIDSchema s: idSchemaList) {
 			if(s.getRequired() && s.getControlType() != null && s.getControlType().equals("dropdown") &&
@@ -851,7 +782,7 @@ public  class MosipMasterData {
 			
 			tbl.put(levelName, lc);
 			
-			getChildLocations( locSchemaList, langCode,lc.getCode() , levelName, tbl,locHiModels);
+			getChildLocations( locSchemaList, langCode,lc.getCode() , levelName, tbl,maxLevel);
 		}
 		
 		idschema.setTblLocations(tblList);
@@ -859,7 +790,7 @@ public  class MosipMasterData {
 		return idschema;
 	}
 	static void getChildLocations(List<MosipIDSchema> locHirachyList, String langCode, String levelCode,
-			String levelName, Hashtable<String, MosipLocationModel> tbl, LocationHierarchyModel[]  locHiModels) {
+			String levelName, Hashtable<String, MosipLocationModel> tbl, int maxLevel) {
 
 		int idx=0;
 		Stack<List<MosipLocationModel>> stk = new Stack<List<MosipLocationModel>>();
@@ -880,8 +811,8 @@ public  class MosipMasterData {
 				tbl.put(levelName, lc);
 				
 				levelCode = lc.getCode();
-			//	if(lc.getHierarchyLevel() >= maxLevel)
-			//		break;
+				if(lc.getHierarchyLevel() >= maxLevel)
+					break;
 			}
 			else
 				break;
@@ -889,6 +820,67 @@ public  class MosipMasterData {
 			
 		
 	}
+
+	public static String getIDschemaStringLatest(){
+
+		String url = VariableManager.getVariableValue("urlBase").toString() +
+				VariableManager.getVariableValue(
+				VariableManager.NS_MASTERDATA,
+				//"individualtypes"
+				"idschemaapi"
+				).toString();
+
+		
+
+		try {
+			JSONObject resp = RestClient.get(url, genQueryParams(), new JSONObject());
+
+			return resp.toString();
+
+		
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "{\"Failed\"}";
+		
+	}
+
+	public static String postSchema(String id, int version,  JSONArray schema){
+
+		String url = VariableManager.getVariableValue("urlBase").toString() +
+		VariableManager.getVariableValue(VariableManager.NS_MASTERDATA,"idschema").toString();
+	
+
+		JSONObject request = new JSONObject();
+		request.put("description", "new ID schema post");
+		request.put("effectiveFrom", CommonUtil.getUTCDateTime(LocalDateTime.now()));
+		request.put("schema", schema);
+		request.put("schemaVersion", version);
+		request.put("title", "test");
+
+
+		JSONObject obj = new JSONObject();
+		obj.put("id", id);
+		obj.put("metadata", new JSONObject());
+		obj.put("request", request);
+		obj.put("requesttime", CommonUtil.getUTCDateTime(LocalDateTime.now()));
+		obj.put("version", "1.0");
+
+
+
+		JSONObject resp;
+		try{
+			resp = RestClient.post(url, obj);
+			return resp.toString();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			return "{\"post failed\"}";
+		}
+
+	}
+
 	static Boolean validateCondn(String cndnexpr, Object inputObject) {
 		return MVEL.evalToBoolean(cndnexpr,inputObject);
 	}
@@ -901,7 +893,7 @@ public  class MosipMasterData {
 		.addCondition(ResidentAttribute.RA_Age, ResidentAttribute.RA_Adult)
 		.addCondition(ResidentAttribute.RA_Finger, false);
 		List<ResidentModel> lst =  residentProvider.generate();
-		Hashtable<Double, Properties>  schema = MosipMasterData.getIDSchemaLatestVersion();
+		Hashtable<Double, List<MosipIDSchema>>  schema = MosipMasterData.getIDSchemaLatestVersion();
 		Set<Double> schemaIds = schema.keySet();
 		Double schemVersion = schema.keySet().iterator().next();
 	
@@ -920,8 +912,7 @@ public  class MosipMasterData {
 			
 			
 	
-			List<MosipIDSchema> lstSchema = (List<MosipIDSchema>) schema.get( schemVersion).get("schemaList");
-			for( MosipIDSchema idschema:lstSchema ) {
+			for( MosipIDSchema idschema: schema.get( schemVersion)) {
 				//System.out.println(idschema.toJSONString());
 				List<SchemaRule>  rule = idschema.getRequiredOn();
 				if(rule != null) {
@@ -936,116 +927,112 @@ public  class MosipMasterData {
 		}
 	}
 	public static void main(String[] args) {
-	
-		VariableManager.setVariableValue("urlBase","https://sandbox.mosip.net/");
-		VariableManager.setVariableValue("configpath","config/*/mz/1.1.5/registration-processor-mz.properties");
-
-	
-		MosipDataSetup.getConfig();
-	//	List<MosipDeviceModel> devices = MosipDataSetup.getDevices("10002");
-		test1();
 		
-	//	List<DynamicFieldModel> lstDyn =  MosipMasterData.getAllDynamicFields();
-		List<MosipMachineModel> mach =  MosipDataSetup.getMachineDetail("10082", "eng");
-		MosipDataSetup.getMachineConfig(mach.get(0).getName()) ;
-		
-		
-		Hashtable<Double,Properties> tbl1 = getIDSchemaLatestVersion();
-		 double schemaId = tbl1.keys().nextElement();
-		 System.out.println(schemaId);
-		 List<MosipIDSchema> lstSchema = (List<MosipIDSchema>) tbl1.get(schemaId).get("schemaList");
-		 List<String> reqdFields = (List<String>) tbl1.get(schemaId).get("requiredAttributes");
-					
-		
-		List<MosipGenderModel> allg = MosipMasterData.getGenderTypes();
-		allg.forEach( g-> {
-			System.out.println(g.getCode() +"\t" + g.getGenderName());
-		});
-		testSchemaRule();
-		System.exit(1);
-		ApplicationConfigIdSchema ss;
-		try {
-			ss = getPreregLocHierarchy("fra",1);
-			System.out.println(ss.toJSONString());
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+		try{
+			JSONObject resp =  RestClient.get("https://sandbox.mosip.net/v1/policymanager/policies/group/mpolicygroup-deafult-abis",genQueryParams(), new JSONObject());
+			System.out.println(resp.toString());
+		}
+		catch(Exception e){
 			e.printStackTrace();
 		}
-		System.exit(0);
+		//VariableManager.setVariableValue("urlBase","https://sandbox.mosip.net/");
+	//	List<MosipDeviceModel> devices = MosipDataSetup.getDevices("10002");
+		
+		// List<DynamicFieldModel> lstDyn =  MosipMasterData.getAllDynamicFields();
+		
+		
+		// Hashtable<Double,List<MosipIDSchema>> tbl1 = getIDSchemaLatestVersion();
+		//  double schemaId = tbl1.keys().nextElement();
+		//  System.out.println(schemaId);
+		// List<MosipGenderModel> allg = MosipMasterData.getGenderTypes();
+		// allg.forEach( g-> {
+		// 	System.out.println(g.getCode() +"\t" + g.getGenderName());
+		// });
+		// testSchemaRule();
+		// System.exit(1);
+		// ApplicationConfigIdSchema ss;
+		// try {
+		// 	ss = getPreregLocHierarchy("fra",1);
+		// 	System.out.println(ss.toJSONString());
+			
+		// } catch (Exception e) {
+		// 	// TODO Auto-generated catch block
+		// 	e.printStackTrace();
+		// }
+		// System.exit(0);
 		
 		 
-		//MosipPreRegLoginConfig c1 =  MosipMasterData.getPreregLoginConfig();
-		//ApplicationConfigIdSchema idschma =	MosipMasterData.getAppConfigIdSchema();
-		//System.out.println(idschma.toJSONString());
+		// //MosipPreRegLoginConfig c1 =  MosipMasterData.getPreregLoginConfig();
+		// //ApplicationConfigIdSchema idschma =	MosipMasterData.getAppConfigIdSchema();
+		// //System.out.println(idschma.toJSONString());
 									 
 		
 
 
-		if(0 ==1) {
+		// if(0 ==1) {
 			
-		HashMap<String,LocationHierarchyModel[]> locHi = getAllLocationHierarchies();
+		// HashMap<String,LocationHierarchyModel[]> locHi = getAllLocationHierarchies();
 		
-		List<MosipGenderModel> genderTypes = MosipMasterData.getGenderTypes();
+		// List<MosipGenderModel> genderTypes = MosipMasterData.getGenderTypes();
 		
-		List<MosipBiometricTypeModel> bioTypes = getBiometricTypes();
-		for(MosipBiometricTypeModel bt: bioTypes) {
+		// List<MosipBiometricTypeModel> bioTypes = getBiometricTypes();
+		// for(MosipBiometricTypeModel bt: bioTypes) {
 			
-			System.out.println(bt.toJSONString());
-			List<MosipBiometricAttributeModel> bioAttrs = getBiometricAttrByTypes(bt.getCode(), bt.getLangCode());
-			for(MosipBiometricAttributeModel bam: bioAttrs) {
-				System.out.println(bam.toJSONString());
-			}
+		// 	System.out.println(bt.toJSONString());
+		// 	List<MosipBiometricAttributeModel> bioAttrs = getBiometricAttrByTypes(bt.getCode(), bt.getLangCode());
+		// 	for(MosipBiometricAttributeModel bam: bioAttrs) {
+		// 		System.out.println(bam.toJSONString());
+		// 	}
 			
-		}
-			Hashtable<String, List<MosipIndividualTypeModel>>indTypes =  getIndividualTypes();
-			List<MosipDocCategoryModel> docCat =getDocumentCategories();
+		// }
+		// 	Hashtable<String, List<MosipIndividualTypeModel>>indTypes =  getIndividualTypes();
+		// 	List<MosipDocCategoryModel> docCat =getDocumentCategories();
 			
-			 List<MosipDocTypeModel> dcoTypes= getDocumentTypes(docCat.get(0).getCode(),docCat.get(0).getLangCode());
+		// 	 List<MosipDocTypeModel> dcoTypes= getDocumentTypes(docCat.get(0).getCode(),docCat.get(0).getLangCode());
 			 
-			//test dynamic fields fields;
+		// 	//test dynamic fields fields;
 		
-			List<DynamicFieldModel> lstDynF =  getAllDynamicFields() ;
-			for(DynamicFieldModel dm: lstDynF) {
+		// 	List<DynamicFieldModel> lstDynF =  getAllDynamicFields() ;
+		// 	for(DynamicFieldModel dm: lstDynF) {
 	
-				System.out.println(dm.getName() );
+		// 		System.out.println(dm.getName() );
 				
 			
-			}
+		// 	}
 				
-			Hashtable<Double,Properties> tbl = getIDSchemaLatestVersion();
-			List<MosipIDSchema> lst = null;
-			if(tbl != null)
-				lst = (List<MosipIDSchema>) tbl.get( tbl.keys().nextElement()).get("schemaList");
-			lst.forEach( (sch)->{
-				System.out.println(sch.getId() + " " + sch.getRequired());
-			});
-			List<MosipLanguage> langs =  getConfiguredLanguages();
+		// 	Hashtable<Double,List<MosipIDSchema>> tbl = getIDSchemaLatestVersion();
+		// 	List<MosipIDSchema> lst = null;
+		// 	if(tbl != null)
+		// 		lst = tbl.get( tbl.keys().nextElement());
+		// 	lst.forEach( (sch)->{
+		// 		System.out.println(sch.getId() + " " + sch.getRequired());
+		// 	});
+		// 	List<MosipLanguage> langs =  getConfiguredLanguages();
 			
-			// getIDSchemaLatestVersion();
-			langs.forEach( (l) ->{
-				System.out.println(l.getCode() + " "+ l.getName());
-				//for(int level=0; level < 5; level++)
+		// 	// getIDSchemaLatestVersion();
+		// 	langs.forEach( (l) ->{
+		// 		System.out.println(l.getCode() + " "+ l.getName());
+		// 		//for(int level=0; level < 5; level++)
 				
-				//getRootLocations(l.getCode());
-				//getChildrenLocations("KTA",l.getCode());
+		// 		//getRootLocations(l.getCode());
+		// 		//getChildrenLocations("KTA",l.getCode());
 				
-				//getLocationHierarchy(l.getCode());
-			});
+		// 		//getLocationHierarchy(l.getCode());
+		// 	});
 			
 			
-			//HashMap<String,LocationHierarchyModel[]> locHi = getAllLocationHierarchies();
-			Set<String> langSet = locHi.keySet();
-			langSet.forEach( (langcode) ->{
-				LocationHierarchyModel[] locHierachies = locHi.get(langcode);
-				for(int i=0; i < locHierachies.length; i++) {
-					List<MosipLocationModel> list = getLocationsByLevel(locHierachies[i].getHierarchyLevelName());
-					list.forEach((m) ->{
-						System.out.println(m.getName());
-					});
-				}	
-			});
+		// 	//HashMap<String,LocationHierarchyModel[]> locHi = getAllLocationHierarchies();
+		// 	Set<String> langSet = locHi.keySet();
+		// 	langSet.forEach( (langcode) ->{
+		// 		LocationHierarchyModel[] locHierachies = locHi.get(langcode);
+		// 		for(int i=0; i < locHierachies.length; i++) {
+		// 			List<MosipLocationModel> list = getLocationsByLevel(locHierachies[i].getHierarchyLevelName());
+		// 			list.forEach((m) ->{
+		// 				System.out.println(m.getName());
+		// 			});
+		// 		}	
+		// 	});
 			
-		}
+		// }
 	}
 }

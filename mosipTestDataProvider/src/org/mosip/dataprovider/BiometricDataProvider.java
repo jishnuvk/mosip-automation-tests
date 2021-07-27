@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 //import java.util.Arrays;
 import java.util.Base64;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -30,7 +29,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.codec.binary.Hex;
-import org.json.JSONObject;
 import org.mosip.dataprovider.mds.MDSClient;
 import org.mosip.dataprovider.mds.MDSClientInterface;
 import org.mosip.dataprovider.mds.MDSClientNoMDS;
@@ -44,7 +42,6 @@ import org.mosip.dataprovider.models.ResidentModel;
 import org.mosip.dataprovider.models.mds.MDSDevice;
 import org.mosip.dataprovider.models.mds.MDSDeviceCaptureModel;
 import org.mosip.dataprovider.models.mds.MDSRCaptureModel;
-import org.mosip.dataprovider.preparation.MosipMasterData;
 import org.mosip.dataprovider.util.CommonUtil;
 import org.mosip.dataprovider.util.DataProviderConstants;
 import org.mosip.dataprovider.util.FPClassDistribution;
@@ -76,7 +73,7 @@ public class BiometricDataProvider {
 
 	
 	
-	static String buildBirIris(String irisInfo, String irisName,String jtwSign,String payload) throws ParserConfigurationException, FactoryConfigurationError, TransformerException, FileNotFoundException {
+	static String buildBirIris(String irisInfo, String irisName) throws ParserConfigurationException, FactoryConfigurationError, TransformerException, FileNotFoundException {
 		String today = CommonUtil.getUTCDateTime(null);
 		XMLBuilder builder = XMLBuilder.create("BIR")
 				.a("xmlns", "http://standards.iso.org/iso-iec/19785/-3/ed-2/")
@@ -89,15 +86,6 @@ public class BiometricDataProvider {
 					.e("Quality").e("Algorithm").e("Organization").t("HMAC").up().e("Type").t("SHA-256").up().up().e("Score").t("100").up()
 				.up().up()
 				.e("BDB").t(irisInfo).up().up();
-		if(jtwSign!=null && payload!=null ) {
-			builder.e("SB").t(jtwSign).up().
-			e("Others").e("Key").t("EXCEPTION").up().e("Value").t("false").up().up().
-			e("Others").e("Key").t("RETRIES").up().e("Value").t("1").up().up().
-			e("Others").e("Key").t("SDK_SCORE").up().e("Value").t("0.0").up().up().
-			e("Others").e("Key").t("FORCE_CAPTURED").up().e("Value").t("false").up().up().
-			e("Others").e("Key").t("PAYLOAD").up().e("Value").t(payload).up().up().
-			e("Others").e("Key").t("SPEC_VERSION").up().e("Value").t("0.9.5").up().up();
-		}
 					
 		//PrintWriter writer = new PrintWriter(new FileOutputStream("cbeffout-finger"+ fingerName+ ".xml"));
 		//builder.toWriter(true, writer, null);
@@ -106,8 +94,9 @@ public class BiometricDataProvider {
 		return builder.asString(null);
 	}
 
-	static String buildBirFinger(String fingerInfo, String fingerName,String jtwSign,String payload) throws ParserConfigurationException, FactoryConfigurationError, TransformerException, FileNotFoundException {
+	static String buildBirFinger(String fingerInfo, String fingerName) throws ParserConfigurationException, FactoryConfigurationError, TransformerException, FileNotFoundException {
 		String today = CommonUtil.getUTCDateTime(null);
+		
 		XMLBuilder builder = XMLBuilder.create("BIR")
 				.a("xmlns", "http://standards.iso.org/iso-iec/19785/-3/ed-2/")
 				.e("Version").e("Major").t("1").up().e("Minor").t("1").up().up()
@@ -119,15 +108,6 @@ public class BiometricDataProvider {
 					.e("Quality").e("Algorithm").e("Organization").t("HMAC").up().e("Type").t("SHA-256").up().up().e("Score").t("100").up()
 				.up().up()
 				.e("BDB").t(fingerInfo).up().up();
-		if(jtwSign!=null && payload!=null ) {
-			builder.e("SB").t(jtwSign).up().
-			e("Others").e("Key").t("EXCEPTION").up().e("Value").t("false").up().up().
-			e("Others").e("Key").t("RETRIES").up().e("Value").t("1").up().up().
-			e("Others").e("Key").t("SDK_SCORE").up().e("Value").t("0.0").up().up().
-			e("Others").e("Key").t("FORCE_CAPTURED").up().e("Value").t("false").up().up().
-			e("Others").e("Key").t("PAYLOAD").up().e("Value").t(payload).up().up().
-			e("Others").e("Key").t("SPEC_VERSION").up().e("Value").t("0.9.5").up().up();
-		}
 					
 		//PrintWriter writer = new PrintWriter(new FileOutputStream("cbeffout-finger"+ fingerName+ ".xml"));
 		//builder.toWriter(true, writer, null);
@@ -135,7 +115,7 @@ public class BiometricDataProvider {
 				
 		return builder.asString(null);
 	}
-	static String buildBirFace(String faceInfo,String jtwSign,String payload) throws ParserConfigurationException, FactoryConfigurationError, TransformerException, FileNotFoundException {
+	static String buildBirFace(String faceInfo) throws ParserConfigurationException, FactoryConfigurationError, TransformerException, FileNotFoundException {
 		String today = CommonUtil.getUTCDateTime(null);
 		
 		XMLBuilder builder = XMLBuilder.create("BIR")
@@ -149,15 +129,6 @@ public class BiometricDataProvider {
 					.e("Quality").e("Algorithm").e("Organization").t("HMAC").up().e("Type").t("SHA-256").up().up().e("Score").t("100").up()
 				.up().up()
 				.e("BDB").t(faceInfo).up().up();
-		if(jtwSign!=null && payload!=null ) {
-			builder.e("SB").t(jtwSign).up().
-			e("Others").e("Key").t("EXCEPTION").up().e("Value").t("false").up().up().
-			e("Others").e("Key").t("RETRIES").up().e("Value").t("1").up().up().
-			e("Others").e("Key").t("SDK_SCORE").up().e("Value").t("0.0").up().up().
-			e("Others").e("Key").t("FORCE_CAPTURED").up().e("Value").t("false").up().up().
-			e("Others").e("Key").t("PAYLOAD").up().e("Value").t(payload).up().up().
-			e("Others").e("Key").t("SPEC_VERSION").up().e("Value").t("0.9.5").up().up();
-		}
 					
 		//PrintWriter writer = new PrintWriter(new FileOutputStream("cbeffout-finger"+ fingerName+ ".xml"));
 		//builder.toWriter(true, writer, null);
@@ -178,35 +149,24 @@ public class BiometricDataProvider {
 	public static MDSRCaptureModel regenBiometricViaMDS(ResidentModel resident) {
 	
 		BiometricDataModel biodata = resident.getBiometric();
-		MDSClientInterface mds = null;
-		String val;
-		boolean bNoMDS = true;
-		String mdsprofilePath = null;
-		String profileName = null;
 		
+		String val =  VariableManager.getVariableValue("mdsport").toString();
+		int port = Integer.parseInt(val);
+		String mdsprofilePath = VariableManager.getVariableValue("mdsprofilepath").toString();
+		
+		port = (port ==0 ? 4501: port);
+	
+		MDSClientInterface mds = null;
 		val =  VariableManager.getVariableValue("mdsbypass").toString();
 		if(val == null || val.equals("") || val.equals("false")) {
-	
-			val =  VariableManager.getVariableValue("mdsport").toString();
-			int port = Integer.parseInt(val);
-			mdsprofilePath = VariableManager.getVariableValue("mdsprofilepath").toString();
-		
-			port = (port ==0 ? 4501: port);
-	
-			mds =new MDSClient(port);
-			profileName = "res"+ resident.getId();
-			mds.createProfile(mdsprofilePath, profileName , resident);
-			mds.setProfile(profileName);
-				
+			 mds =new MDSClient(port);
 		}
 		else {
 			mds = new MDSClientNoMDS();
-			bNoMDS = false;
-			profileName = "res"+ resident.getId();
-			mds.createProfile(mdsprofilePath, profileName , resident);
-			mds.setProfile(profileName);
 		}
-
+		String profileName = "res"+ resident.getId();
+		mds.createProfile(mdsprofilePath, profileName , resident);
+		mds.setProfile(profileName);
 		MDSRCaptureModel capture = null;
 
 		List<String> filteredAttribs = resident.getFilteredBioAttribtures();
@@ -323,30 +283,19 @@ public class BiometricDataProvider {
 			
 		}
 		
-		if(!bNoMDS) {
-			mds.removeProfile( mdsprofilePath, profileName );
-		}
+		mds.removeProfile( mdsprofilePath, profileName );
 		return capture;
 	}
 	
 	public static String toCBEFFFromCapture(List<String> bioFilter,MDSRCaptureModel capture, String toFile) throws Exception {
 	
 		String retXml = "";
-		
-		String mosipVersion=null;
-		try {
-	      mosipVersion=VariableManager.getVariableValue("mosip.version").toString();
-		}catch(Exception e) {
 			
-		}
-
 		XMLBuilder builder = XMLBuilder.create("BIR")
 					.a("xmlns", "http://standards.iso.org/iso-iec/19785/-3/ed-2/")		
 					.e("BIRInfo").e("Integrity").t("false").up().up();
 			
 		builder.getDocument().setXmlStandalone(true);
-		
-		List<String> bioSubType= new ArrayList<>();
 			
 		//Step 1: convert finger print
 		
@@ -364,15 +313,13 @@ public class BiometricDataProvider {
 			for(MDSDeviceCaptureModel cm:lstFingerData) {
 				if(cm.getBioSubType().equals(displayName)) {
 					fingerData = cm.getBioValue();
-					bioSubType.add(finger);
 					break;
 				}
 			}
 
 			if(i >=0 && fingerData != null) {
 					String strFinger = DataProviderConstants.displayFingerName[i];	
-					String	strFingerXml = buildBirFinger(fingerData, strFinger, lstFingerData.get(i).getSb(),
-								lstFingerData.get(i).getPayload());
+					String strFingerXml = buildBirFinger(   fingerData,strFinger);
 					XMLBuilder fbuilder = XMLBuilder.parse(strFingerXml);
 					builder = builder.importXMLBuilder(fbuilder);
 			}
@@ -383,9 +330,8 @@ public class BiometricDataProvider {
 		if(bioFilter.contains("face")) {
 				
 				List<MDSDeviceCaptureModel> lstFaceData =  capture.getLstBiometrics().get(DataProviderConstants.MDS_DEVICE_TYPE_FACE);
-				bioSubType.add("face");
-				String faceXml = buildBirFace( lstFaceData.get(0).getBioValue(),lstFaceData.get(0).getSb(),
-						lstFaceData.get(0).getPayload());
+
+				String faceXml = buildBirFace( lstFaceData.get(0).getBioValue());
 				builder = builder.importXMLBuilder( XMLBuilder.parse( faceXml));
 				
 		}
@@ -396,32 +342,23 @@ public class BiometricDataProvider {
 		if(lstIrisData != null) {
 			String irisXml ="";
 			for(MDSDeviceCaptureModel cm: lstIrisData) {
-				
-				
+					
 				if(bioFilter.contains("leftEye") && cm.getBioSubType().equals("Left")) {
-						irisXml = buildBirIris( cm.getBioValue(), "Left",cm.getSb(),cm.getPayload());
+						irisXml = buildBirIris( cm.getBioValue(), "Left");
 						builder = builder.importXMLBuilder( XMLBuilder.parse( irisXml));
-						bioSubType.add("Left");
 				}
 				if(bioFilter.contains("rightEye") && cm.getBioSubType().equals("Right") ) {
 					
-						irisXml = buildBirIris( cm.getBioValue(), "Right",cm.getSb(),cm.getPayload());
+						irisXml = buildBirIris( cm.getBioValue(), "Right");
 						builder = builder.importXMLBuilder( XMLBuilder.parse( irisXml));
-						bioSubType.add("Right");
 				}
 			}
 		}
-		
-		if (mosipVersion != null && mosipVersion.equalsIgnoreCase("1.2") && !bioSubType.isEmpty()) {
-			builder.e("Others").e("Key").t("CONFIGURED").up().e("Value")
-					.t(bioSubType.toString().substring(1, bioSubType.toString().length() - 1)).up().up();
-		}
+			
 		if(toFile != null) {
 				PrintWriter writer = new PrintWriter(new FileOutputStream(toFile));
 				builder.toWriter(true, writer, null);
 		}
-		
-		
 		retXml = builder.asString(null);
 		return retXml;
 	}
@@ -447,23 +384,19 @@ public class BiometricDataProvider {
 			if(finger.toLowerCase().contains("eye") || finger.toLowerCase().equals("face"))
 				continue;
 			i = Arrays.asList(DataProviderConstants.schemaNames).indexOf(finger);
-			
-			if (i >= 0) {
-				String strFinger = DataProviderConstants.displayFingerName[i];
-				//TODO : THIS NEED TO IMPLEMENTED  WHEN WILL WORK WITH MDS
-				String strFingerXml = buildBirFinger(fingerPrint[i], strFinger,null,null);
+			if(i >=0) {
+				String strFinger = DataProviderConstants.displayFingerName[i];	
+				String strFingerXml = buildBirFinger(   fingerPrint[i],strFinger);
 				XMLBuilder fbuilder = XMLBuilder.parse(strFingerXml);
 				builder = builder.importXMLBuilder(fbuilder);
 			}
-			 
 			
 		}
 		
 		//Step 2: Add Face
 		if(bioFilter.contains("Face")) {
 			if(biometricDataModel.getEncodedPhoto() != null) {
-				//TODO : THIS NEED TO IMPLEMENTED  WHEN WILL WORK WITH MDS
-				String faceXml = buildBirFace( biometricDataModel.getEncodedPhoto(),null,null);
+				String faceXml = buildBirFace( biometricDataModel.getEncodedPhoto());
 				builder = builder.importXMLBuilder( XMLBuilder.parse( faceXml));
 			}
 		}
@@ -473,13 +406,12 @@ public class BiometricDataProvider {
 		if(irisInfo != null) {
 			String irisXml ="";
 			if(bioFilter.contains("leftEye")) {
-				//TODO : THIS NEED TO IMPLEMENTED  WHEN WILL WORK WITH MDS
-				irisXml = buildBirIris( irisInfo.getLeft(), "Left",null,null);
+				irisXml = buildBirIris( irisInfo.getLeft(), "Left");
 				builder = builder.importXMLBuilder( XMLBuilder.parse( irisXml));
 			}
 			if(bioFilter.contains("rightEye")) {
-				//TODO : THIS NEED TO IMPLEMENTED  WHEN WILL WORK WITH MDS
-				irisXml = buildBirIris( irisInfo.getRight(), "Right",null,null);
+				
+				irisXml = buildBirIris( irisInfo.getRight(), "Right");
 				builder = builder.importXMLBuilder( XMLBuilder.parse( irisXml));
 			}
 		}
@@ -809,23 +741,6 @@ public class BiometricDataProvider {
 		return retVal;
 	}
 	public static void main(String[] args) {
-		
-		try {
-			String value=buildBirFinger("addfdfd","finger","jwtSign","payload");
-			System.out.println(value);
-		} catch (FileNotFoundException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (ParserConfigurationException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (FactoryConfigurationError e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (TransformerException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
 		
 		try {
 			List<IrisDataModel> m = generateIris(1);

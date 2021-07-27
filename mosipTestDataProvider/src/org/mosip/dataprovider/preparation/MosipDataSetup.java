@@ -1,17 +1,8 @@
 package org.mosip.dataprovider.preparation;
 
 
-
-import java.security.MessageDigest;
-
-import static io.restassured.RestAssured.given;
-
-import java.io.Reader;
-import java.io.StringReader;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Properties;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,34 +18,13 @@ import org.mosip.dataprovider.util.RestClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.cucumber.core.gherkin.messages.internal.gherkin.internal.com.eclipsesource.json.Json;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import variables.VariableManager;
 
 public class MosipDataSetup {
 
-	public static Properties getConfig() {
-		Properties props = new Properties();
+	public static void geConfig() {
 		//https://sandbox.mosip.net/config/*/mz/1.1.4/print-mz.properties
 		//https://dev.mosip.net/config/*/mz/develop/registration-processor-mz.properties
-		String configPath = "config/*/mz/develop/pre-registration-mz.properties";
-		
-		try {
-			configPath = VariableManager.getVariableValue("configpath").toString();
-		}catch(Exception e) {}
-		
-		String url = VariableManager.getVariableValue("urlBase").toString() + configPath;
-		
-		try {
-			Response response = given().contentType(ContentType.TEXT).get(url );
-    		if(response.getStatusCode() == 200) {
-    			props.load(new StringReader(response.getBody().asString()));
-    		}
-    	} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return props;
 	}
 	public static Object getCache(String key) {
 	
@@ -68,55 +38,6 @@ public class MosipDataSetup {
 	public static void setCache(String key, Object value) {
 		
 		VariableManager.setVariableValue(key,  value);
-	}
-	
-	//GET "https://dev.mosip.net/v1/syncdata/configs/<machine_name>" - machine config
-	public static void getMachineConfig(String machineName) {
-		String url = VariableManager.getVariableValue("urlBase").toString() +
-				VariableManager.getVariableValue("syncdata").toString();
-				
-		url = url + machineName;
-		JSONObject resp;
-		try {
-			resp = RestClient.get(url,new JSONObject() , new JSONObject());
-			if(resp != null) {
-				JSONArray typeArray = resp.getJSONArray("machines");
-		
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	// get all machines
-	public static List<MosipMachineModel> getMachineDetail(String machineId, String langCode) {
-		
-		List<MosipMachineModel> machines = null;
-		String url = VariableManager.getVariableValue("urlBase").toString() +
-		VariableManager.getVariableValue(VariableManager.NS_MASTERDATA,"machinedetail").toString();
-		url = url + machineId + "/" + langCode;
-		
-		Object o =getCache(url);
-		if(o != null)
-			return( (List<MosipMachineModel>) o);
-		
-		try {
-			JSONObject resp = RestClient.get(url,new JSONObject() , new JSONObject());
-			if(resp != null) {
-				JSONArray typeArray = resp.getJSONArray("machines");
-				ObjectMapper objectMapper = new ObjectMapper();
-				machines = objectMapper.readValue(typeArray.toString(), 
-						objectMapper.getTypeFactory().constructCollectionType(List.class, MosipMachineModel.class));
-				
-				setCache(url, machines);
-			
-			}
-			
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		return machines;
 	}
 	public static void createRegCenterType(MosipRegistrationCenterTypeModel type) {
 		String url = VariableManager.getVariableValue("urlBase").toString() +
@@ -355,9 +276,7 @@ public class MosipDataSetup {
 				VariableManager.getVariableValue("mockABISsetExpectaion").toString();
 
 		JSONObject req = new JSONObject();
-		//req.put("id", CommonUtil.getSHA(bdbString));
-		byte[] valBytes=java.util.Base64.getUrlDecoder().decode(bdbString);
-		req.put("id", CommonUtil.getSHAFromBytes(valBytes));
+		req.put("id", CommonUtil.getSHA(bdbString));
 		req.put("version","1.0");
 		req.put("requesttime",CommonUtil.getUTCDateTime(null) );
 		req.put("actionToInterfere",operation );
@@ -373,8 +292,7 @@ public class MosipDataSetup {
 			JSONArray arr = new JSONArray();
 			for(String s: duplicateBdbs) {
 				JSONObject ref = new JSONObject();
-				//ref.put("referenceId", CommonUtil.getSHA(bdbString));
-				ref.put("referenceId", CommonUtil.getSHAFromBytes(valBytes));
+				ref.put("referenceId", CommonUtil.getSHA(bdbString));
 				arr.put(ref);
 			}
 			duprefs.put("referenceIds", arr);
@@ -394,8 +312,6 @@ public class MosipDataSetup {
 
 		return responseStr;
 	}
-	
-	
 	public static String uploadPackets( List<String> packetPaths) {
 
 		String responseStr = "";

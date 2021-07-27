@@ -22,7 +22,9 @@ public class ContextUtils {
 	   
 	  Logger logger = LoggerFactory.getLogger(ContextUtils.class);
 	   public Properties loadServerContext(String ctxName) {
-	    	String filePath =  personaConfigPath + "/server.context."+  ctxName + ".properties";
+	    	// String filePath =  personaConfigPath + "/server.context."+  ctxName + ".properties";  //not working
+	    	String filePath =  "../deploy/resource" + "/server.context."+  ctxName + ".properties";  //working
+
 	    	Properties p=new Properties();
 	        
 	    	FileReader reader;

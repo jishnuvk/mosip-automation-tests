@@ -1,0 +1,136 @@
+{
+    1"errors": [
+      {
+        "errorCode": "string",
+        "message": "string"
+      }
+    ],
+    "id": "string",
+    "metadata": {},
+    "response": { -> request
+     1 "createdBy": "string",
+     1 "createdOn": "2021-06-20T09:46:53.833Z",
+      "description": "string",
+      "effectiveFrom": "2021-06-20T09:46:53.833Z",
+      1"id": "string",
+      1"idVersion": 0,
+      "schema": [
+        {
+        0  "alignmentGroup": "string",
+        0  "bioAttributes": [
+            "string"
+          ],
+        0  "changeAction": "string",
+        0  "contactType": "string",
+        0  "controlType": "string",
+        0  "description": "string",
+        0  "fieldCategory": "string",
+        0  "fieldType": "string",
+        0  "format": "string",
+        0  "group": "string",
+        0  "id": "string",
+        0  "inputRequired": true,
+        0  "label": {
+            "additionalProp1": "string",
+            "additionalProp2": "string",
+            "additionalProp3": "string"
+          },
+        0  "maximum": 0,
+        0  "minimum": 0,
+        0  "required": true,
+        0  "requiredOn": [
+            {
+              "engine": "string",
+              "expr": "string"
+            }
+          ],
+        0  "subType": "string",
+        0  "type": "string",
+        0  "validators": [
+            {
+              "arguments": [
+                "string"
+              ],
+              "langCode": "string",
+              "type": "string",
+              "validator": "string"
+            }
+          ],
+        0  "visible": {
+            "engine": "string",
+            "expr": "string"
+          }
+        }
+      ],
+      1"schemaJson": "string",
+     1 "status": "string",
+      "title": "string",
+      1"updatedBy": "string",
+      1"updatedOn": "2021-06-20T09:46:53.834Z",
+      "schemaVersion": 0,
+    },
+    "responsetime": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", -> requestTime
+    "version": "string"
+}
+
+
+{
+    "id": "string",
+    "metadata": {},
+    "request": {
+      "description": "string",
+      "effectiveFrom": "2021-06-20T09:42:11.894Z",
+      "schema": [
+        {
+          "alignmentGroup": "string",
+          "bioAttributes": [
+            "string"
+          ],
+          "changeAction": "string",
+          "contactType": "string",
+          "controlType": "string",
+          "description": "string",
+          "fieldCategory": "string",
+          "fieldType": "string",
+          "format": "string",
+          "group": "string",
+          "id": "string",
+          "inputRequired": true,
+          "label": {
+            "additionalProp1": "string",
+            "additionalProp2": "string",
+            "additionalProp3": "string"
+          },
+          "maximum": 0,
+          "minimum": 0,
+          "required": true,
+          "requiredOn": [
+            {
+              "engine": "string",
+              "expr": "string"
+            }
+          ],
+          "subType": "string",
+          "type": "string",
+          "validators": [
+            {
+              "arguments": [
+                "string"
+              ],
+              "langCode": "string",
+              "type": "string",
+              "validator": "string"
+            }
+          ],
+          "visible": {
+            "engine": "string",
+            "expr": "string"
+          }
+        }
+      ],
+      "schemaVersion": 0,
+      "title": "string"
+    },
+    "requesttime": "2018-12-10T06:12:52.994Z",
+    "version": "string"
+  }

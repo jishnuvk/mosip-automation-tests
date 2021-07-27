@@ -11,7 +11,7 @@ public class MosipMachineModel implements Serializable{
 	 
 	String id;
 	String	ipAddress;
-    Boolean isActive;
+    boolean isActive;
     String 	langCode;
     String	macAddress;
     String	machineSpecId;
@@ -22,8 +22,4 @@ public class MosipMachineModel implements Serializable{
     String	signPublicKey;
     String	validityDateTime;
     String	zoneCode;
-    public boolean isActive() {
-    	return isActive;
-    }
 }
-

@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch CertificateGenerator",
+            "request": "launch",
+            "mainClass": "org.mosip.dataprovider.test.partnerManagement.CertificateGenerator",
+            "projectName": "dataprovider"
+        },
+        {
+            "type": "java",
+            "name": "Launch CertificateUploader",
+            "request": "launch",
+            "mainClass": "org.mosip.dataprovider.test.CertificateUploader",
+            "projectName": "dataprovider"
+        },
+        {
+            "type": "java",
+            "name": "Launch MosipMasterData",
+            "request": "launch",
+            "mainClass": "org.mosip.dataprovider.preparation.MosipMasterData",
+            "projectName": "dataprovider"
+        },
+        {
+            "type": "java",
             "request": "attach",
             "name": "Java",
             "port": 5005,
